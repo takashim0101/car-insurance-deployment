@@ -1,0 +1,55 @@
+# version: '3.8' # This line has been removed so the latest Compose V2 spec will always be used.
+
+services:
+
+  # Backend services
+  backend:
+    # Specify the directory where Dockerfile exists
+    build: ./car-insurance-recommendation-backend-docker
+    # Mapping of container port and host port
+    ports:
+      - "3000:3000"
+    # Setting environment variables
+    environment:
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+    # Automatically restart container if crashed
+    restart: always
+    # Setting container name
+    container_name: insurance-backend
+    # Declare dependency on MongoDB
+    depends_on:
+      - mongodb
+
+  # Frontend service
+  frontend:
+    # Specify the directory where Dockerfile exists
+    build: ./car-insurance-recommendation-frontend-docker
+    # Mapping of container port and host port
+    ports:
+      - "80:80"
+    # Declare dependency on backend
+    depends_on:
+      - backend
+    # Automatically restart container if crashed
+    restart: always
+    # Setting container name
+    container_name: insurance-frontend
+
+  # MongoDB database service
+  mongodb:
+    # Use official MongoDB image
+    image: mongo:latest
+    # Host and container port mapping
+    ports:
+      - "27017:27017"
+    # Set volumes for data persistence
+    volumes:
+      - mongodb_data:/data/db # 'Use volume named 'mongodb_data
+    # Automatically restart container if it crashes
+    restart: always
+    # Set container name
+    container_name: insurance-mongodb
+
+# Volume definition
+volumes:
+  mongodb_data: {}
